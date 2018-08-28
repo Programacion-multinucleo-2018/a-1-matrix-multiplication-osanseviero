@@ -27,3 +27,5 @@ Rubric:
 5. The report file has tables with the performance data for the different configurations, as well as for the speedup obtained.
 6. The report file has the computer's characteristics, as well as the conclusions.
 
+Omar Sanseviero
+
