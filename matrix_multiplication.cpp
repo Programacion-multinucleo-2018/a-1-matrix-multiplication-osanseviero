@@ -1,6 +1,5 @@
 // Implements matrix multiplication using CPU.
 // Compile with g++ matrix_multiplication.cpp  -std=c++11
-// 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +7,7 @@
 #include <iostream>
 #include <chrono>
 
-// Multiplies two matrix and store result in an output matrix
+// Multiplies two matrices and store result in an output matrix
 void multiply_matrix(long *matA, long *matB, long *matC, int n) {
     for(int i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
@@ -37,9 +36,6 @@ int main(int argc, char* argv[]) {
         b[i] = i+1;
     }
 
-    struct timespec start, finish;
-    double elapsed;
-
     auto start_cpu =  std::chrono::high_resolution_clock::now();
     multiply_matrix(a, b, c, n);
     auto end_cpu =  std::chrono::high_resolution_clock::now();
@@ -48,6 +44,7 @@ int main(int argc, char* argv[]) {
     std::chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
     printf("multiply_matrix_gpu elapsed %f ms\n", duration_ms.count());
 
+    // Free memory
     free(a);
     free(b);
     free(c);

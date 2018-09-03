@@ -1,3 +1,6 @@
+// Implements matrix multiplication using OpenMP.
+// Compile with g++ matrix_multiplication_threads.cpp -std=c++11
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -5,29 +8,32 @@
 #include <chrono>
 #include <omp.h>
  
-void multiply_matrix_omp(long* input_matrix_a, long* input_matrix_b, long* output_matrix, int n) {
+// Multiplies matrices using OpenMP
+void multiply_matrix_omp(long *matA, long *matB, long *matC, int n) {
     int i = 0;
-    #pragma omp parallel for private(i) shared(input_matrix_a, input_matrix_b, output_matrix)
+    #pragma omp parallel for private(i) shared(matA, matB, matC)
 
     for(i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
             for(int k=0; k<n; k++) {
-                output_matrix[i*n+j] += input_matrix_a[i*n+k] * input_matrix_b[j+k*n];
+                matC[i*n+j] += matA[i*n+k] * matB[j+k*n];
             }
         }
     }
 }
 
-void multiply_matrix(long* input_matrix_a, long* input_matrix_b, long* output_matrix, int n) {
+// Multiplies two matrices and store result in an output matrix
+void multiply_matrix(long *matA, long *matB, long *matC, int n) {
     for(int i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
             for(int k=0; k<n; k++) {
-                output_matrix[i*n+j] += input_matrix_a[i*n+k] * input_matrix_b[j+k*n];
+                matC[i*n+j] += matA[i*n+k] * matB[j+k*n];
             }
         }
     }
 }
 
+// Compares two matrices
 void checkResult(long *matrix_a, long *matrix_b, const int n) {
     double epsilon = 1.0E-8;
     bool match = 1;
@@ -66,27 +72,28 @@ int main(int argc, char* argv[]) {
         b2[i] = i+1;
     }
 
-    struct timespec start, finish;
-    double elapsed;
-
+    // Multiply matrix without threads
     auto start_cpu =  std::chrono::high_resolution_clock::now();
     multiply_matrix(a1, b1, c1, n);
     auto end_cpu =  std::chrono::high_resolution_clock::now();
-    // Measure total time
+
+    // Measure total time in CPU
     std::chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
-    std::cout << "time without threads: " << duration_ms.count() << std::endl;
+    printf("multiply_matrix elapsed %f ms\n", duration_ms.count());
 
-
+    // Multiply matrix with threads
     start_cpu =  std::chrono::high_resolution_clock::now();
     multiply_matrix_omp(a2, b2, c2, n);
     end_cpu =  std::chrono::high_resolution_clock::now();
+
+    // Measure total time in CPU with threads
     duration_ms = end_cpu - start_cpu;
-    std::cout << "time with threads: " << duration_ms.count() << std::endl;
+    printf("multiply_matrix_omp elapsed %f ms\n", duration_ms.count());
 
     // Check results
     checkResult(c1, c2, n);
 
-    
+    // Free memory
     free(a1);
     free(b1);
     free(c1);

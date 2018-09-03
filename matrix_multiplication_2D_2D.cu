@@ -1,8 +1,5 @@
-/* 
- * Matrix Multiplication in gpu with 2D grid of blocks
- * https://imgur.com/DHGl22F
- *
- */
+// Matrix Multiplication in gpu with 2D grid of blocks with 2D block shape
+// Compile with: nvcc -o test matrix_multiplication_2D_2D.cu -std=c++11
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +7,8 @@
 #include <iostream>
 #include <chrono>
  
-__global__ void multiply_matrix_gpu(long* matA, long* matB, long* matC, const int n) {
+// Multiplies matrices using GPU with 2D grid
+__global__ void multiply_matrix_gpu(long *matA, long *matB, long *matC, const int n) {
     unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
     unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
@@ -21,16 +19,18 @@ __global__ void multiply_matrix_gpu(long* matA, long* matB, long* matC, const in
     }
 }
 
-void multiply_matrix_host(long* input_matrix_a, long* input_matrix_b, long* output_matrix, const int n) {
+// Multiplies matrices in host
+void multiply_matrix_host(long *matA, long *matB, long *matC, int n) {
     for(int i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
             for(int k=0; k<n; k++) {
-                output_matrix[i*n+j] += input_matrix_a[i*n+k] * input_matrix_b[j+k*n];
+                matC[i*n+j] += matA[i*n+k] * matB[j+k*n];
             }
         }
     }
 }
 
+// Compares two matrices
 void checkResult(long *hostRef, long *gpuRef, const int n) {
     double epsilon = 1.0E-8;
     bool match = 1;
@@ -46,7 +46,8 @@ void checkResult(long *hostRef, long *gpuRef, const int n) {
     if (match) printf("Matrix match.\n\n");
     else printf("Matrix does not not match.\n\n");
 }
- 
+
+
 int main(int argc, char* argv[]) {
     // Set up device
     int dev = 0;
@@ -56,7 +57,7 @@ int main(int argc, char* argv[]) {
     cudaSetDevice(dev);
 
     // Size of matrix
-    int n = 3;
+    int n = 1000;
     int bytes = n * n * sizeof(long*);
 
     // Host matrix memory

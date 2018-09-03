@@ -1,8 +1,6 @@
-/* 
- * Matrix Multiplication in gpu with 1D grid
- * https://imgur.com/DHGl22F
- *
- */
+// Matrix Multiplication in gpu with 1D grid of blocks and 1D block shape.
+// Example run: https://imgur.com/DHGl22F
+// Compile with: nvcc -o test matrix_multiplication_1D.cu -std=c++11
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +8,8 @@
 #include <iostream>
 #include <chrono>
  
-__global__ void multiply_matrix_gpu(long* matA, long* matB, long* matC, const int n) {
+// Multiplies matrices using GPU with 1D grid
+__global__ void multiply_matrix_gpu(long *matA, long *matB, long *matC, const int n) {
     unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (ix < n) {
@@ -22,16 +21,18 @@ __global__ void multiply_matrix_gpu(long* matA, long* matB, long* matC, const in
     }
 }
 
-void multiply_matrix_host(long* input_matrix_a, long* input_matrix_b, long* output_matrix, const int n) {
+// Multiplies matrices in host
+void multiply_matrix_host(long *matA, long *matB, long *matC, int n) {
     for(int i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
             for(int k=0; k<n; k++) {
-                output_matrix[i*n+j] += input_matrix_a[i*n+k] * input_matrix_b[j+k*n];
+                matC[i*n+j] += matA[i*n+k] * matB[j+k*n];
             }
         }
     }
 }
 
+// Compares two matrices
 void checkResult(long *hostRef, long *gpuRef, const int n) {
     double epsilon = 1.0E-8;
     bool match = 1;
@@ -48,6 +49,7 @@ void checkResult(long *hostRef, long *gpuRef, const int n) {
     else printf("Matrix does not not match.\n\n");
 }
  
+
 int main(int argc, char* argv[]) {
     // Set up device
     int dev = 0;
@@ -109,7 +111,7 @@ int main(int argc, char* argv[]) {
     cudaDeviceSynchronize();
     end_cpu =  std::chrono::high_resolution_clock::now();
 
-    // Measure total time
+    // Measure total time in GPU
     duration_ms = end_cpu - start_cpu;
     printf("multiply_matrix_gpu elapsed %f ms\n", duration_ms.count());
 
