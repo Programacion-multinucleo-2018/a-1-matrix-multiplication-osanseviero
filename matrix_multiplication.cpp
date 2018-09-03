@@ -16,7 +16,7 @@ void multiply_matrix(long* input_matrix_a, long* input_matrix_b, long* output_ma
  
 int main(int argc, char* argv[]) {
     // Size of matrix
-    int n = 4000;
+    int n = 1000;
     int bytes = n * n * sizeof(long*);
 
     // Input matrix pointers

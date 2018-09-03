@@ -12,7 +12,7 @@
  
 __global__ void multiply_matrix_gpu(long* matA, long* matB, long* matC, const int n) {
     unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
-    unsigned int iy = blockIdx.y;
+    unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
     if (ix < n && iy < n) {
         for(int k=0; k<n; k++) {
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     cudaSetDevice(dev);
 
     // Size of matrix
-    int n = 1000;
+    int n = 3;
     int bytes = n * n * sizeof(long*);
 
     // Host matrix memory
@@ -98,9 +98,9 @@ int main(int argc, char* argv[]) {
     cudaMemset(d_c, 0, bytes);  // Initialize matrix with 0s
 
     // Kernel execution configuration
-    dim3 block(128);
-    dim3 grid((n + block.x - 1) / block.x, n);
-    printf("grid.x %d grid.y %d block.x %d \n", grid.x, grid.y, block.x);
+    dim3 block(32, 32);
+    dim3 grid((n + block.x - 1) / block.x, (n + block.y - 1) / block.y);
+    printf("grid.x %d grid.y %d block.x %d block.y %d\n", grid.x, grid.y, block.x, block.y);
 
     // Execute kernel
     start_cpu = std::chrono::high_resolution_clock::now();
