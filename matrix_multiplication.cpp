@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <iostream>
 #include <chrono>
 
 // Multiplies two matrices and store result in an output matrix
