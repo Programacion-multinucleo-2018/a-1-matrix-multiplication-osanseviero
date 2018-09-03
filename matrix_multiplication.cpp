@@ -1,14 +1,19 @@
+// Implements matrix multiplication using CPU.
+// Compile with g++ matrix_multiplication.cpp  -std=c++11
+// 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
 #include <chrono>
- 
-void multiply_matrix(long* input_matrix_a, long* input_matrix_b, long* output_matrix, int n) {
+
+// Multiplies two matrix and store result in an output matrix
+void multiply_matrix(long *matA, long *matB, long *matC, int n) {
     for(int i = 0; i<n; i++) {
         for(int j=0; j<n; j++) {
             for(int k=0; k<n; k++) {
-                output_matrix[i*n+j] += input_matrix_a[i*n+k] * input_matrix_b[j+k*n];
+                matC[i*n+j] += matA[i*n+k] * matB[j+k*n];
             }
         }
     }
@@ -20,11 +25,11 @@ int main(int argc, char* argv[]) {
     int bytes = n * n * sizeof(long*);
 
     // Input matrix pointers
-    long* a = (long *)malloc(bytes);
-    long* b = (long *)malloc(bytes);
+    long *a = (long *)malloc(bytes);
+    long *b = (long *)malloc(bytes);
 
     // Output matrix pointer
-    long* c = (long *)malloc(bytes);
+    long *c = (long *)malloc(bytes);
 
     // Initialize matrix
     for(int i = 0; i < n*n; i++ ) {
@@ -41,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     // Measure total time
     std::chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
-    std::cout << "time: " << duration_ms.count() << std::endl;
+    printf("multiply_matrix_gpu elapsed %f ms\n", duration_ms.count());
 
     free(a);
     free(b);
